@@ -1,10 +1,11 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Body
+from fastapi import APIRouter, Body, Depends
 from pydantic import conlist
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from api.pets.queries import create_new_pet, get_pets, is_pet_existing, delete_many_pets
+from api.pets.queries import (create_new_pet, delete_many_pets, get_pets,
+                              is_pet_existing)
 from api.pets.schemas import (PetCreateSchema, PetReadListWithCountSchema,
                               PetReadSchema)
 from db.database import get_db_session

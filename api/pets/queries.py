@@ -1,4 +1,4 @@
-from sqlalchemy import select, exists, delete
+from sqlalchemy import delete, exists, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.pets.models import Pet
