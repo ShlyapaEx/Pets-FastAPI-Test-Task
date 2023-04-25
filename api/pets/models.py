@@ -24,6 +24,9 @@ class Pet(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(100))
     age: Mapped[int] = mapped_column(Integer())
-    type: Mapped[str] = mapped_column(PetTypesColumn)
+    type: Mapped[PetTypes] = mapped_column(PetTypesColumn)
     created_at: Mapped[datetime] = mapped_column(DateTime(),
                                                  server_default=func.now())
+
+    def __repr__(self, *args, **kwargs) -> str:
+        return f"<Pet {self.id} {self.name} {self.type.value}>"
