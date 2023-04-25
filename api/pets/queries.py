@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select, exists, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.pets.models import Pet
@@ -17,3 +17,15 @@ async def create_new_pet(session: AsyncSession, pet: PetCreateSchema):
     await session.commit()
     await session.refresh(new_pet)
     return new_pet
+
+
+async def is_pet_existing(session: AsyncSession, id: int):
+    query = select(exists(Pet).where(Pet.id == id))
+    pet = await session.execute(query)
+    return pet.scalar()
+
+
+async def delete_many_pets(session: AsyncSession, ids: list[int]):
+    query = delete(Pet).where(Pet.id.in_(ids))
+    await session.execute(query)
+    await session.commit()
