@@ -29,3 +29,13 @@ class PetReadSchema(PetBaseSchema):
 class PetReadListWithCountSchema(BaseModel):
     count: int
     items: list[PetReadSchema] = []
+
+
+class PetNotExistingErrorSchema(BaseModel):
+    id: int
+    error: str = 'Pet with the matching ID was not found.'
+
+
+class PetDeleteResponseSchema(BaseModel):
+    deleted: int
+    errors: list[PetNotExistingErrorSchema]

@@ -1,13 +1,13 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Body, Depends
-from pydantic import conlist
+from pydantic import conlist, PositiveInt
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.pets.queries import (create_new_pet, delete_many_pets, get_pets,
                               get_existing_pets_ids)
 from api.pets.schemas import (PetCreateSchema, PetReadListWithCountSchema,
-                              PetReadSchema)
+                              PetReadSchema, PetDeleteResponseSchema)
 from db.database import get_db_session
 
 pets_router = APIRouter()
@@ -28,10 +28,11 @@ async def create_pet(*, session: AsyncSession = Depends(get_db_session),
     return new_pet
 
 
-@pets_router.delete('/')
+@pets_router.delete('/', response_model=PetDeleteResponseSchema)
 async def delete_pets(*, session: AsyncSession = Depends(get_db_session),
-                      ids: Annotated[conlist(item_type=int, unique_items=True,
-                                             min_items=1), Body()]):  # type: ignore
+                      ids: Annotated[conlist(item_type=PositiveInt,
+                                             unique_items=True, min_items=1),
+                                     Body(example=[1, 2, 3])]):
     errors = []
     existing_pets = await get_existing_pets_ids(session, ids)
     existing_pets_ids = existing_pets.all()
