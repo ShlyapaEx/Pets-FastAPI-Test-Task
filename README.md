@@ -55,4 +55,4 @@
 
 ## Внешний вид страницы с документацией приложения
 
-![/docs swagger image](FastAPI%20Test%20Task%20%E2%80%94%20Pets%208c7e76e4032f4f73966d916e35a08361/Untitled.png)
+![/docs swagger image](https://user-images.githubusercontent.com/98982398/234563432-116c5feb-6a6f-43aa-af50-44610aee2fcc.png)
