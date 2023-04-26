@@ -1,13 +1,13 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Body, Depends
-from pydantic import conlist, PositiveInt
+from pydantic import PositiveInt, conlist
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from api.pets.queries import (create_new_pet, delete_many_pets, get_pets,
-                              get_existing_pets_ids)
-from api.pets.schemas import (PetCreateSchema, PetReadListWithCountSchema,
-                              PetReadSchema, PetDeleteResponseSchema)
+from api.pets.queries import (create_new_pet, delete_many_pets,
+                              get_existing_pets_ids, get_pets)
+from api.pets.schemas import (PetCreateSchema, PetDeleteResponseSchema,
+                              PetReadListWithCountSchema, PetReadSchema)
 from db.database import get_db_session
 
 pets_router = APIRouter()
