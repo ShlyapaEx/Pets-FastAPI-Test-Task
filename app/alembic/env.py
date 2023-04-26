@@ -1,5 +1,5 @@
 import asyncio
-from db.database import DATABASE_URL
+from db.database import DATABASE_URL, Base
 from logging.config import fileConfig
 
 from sqlalchemy import pool
@@ -23,7 +23,6 @@ if config.config_file_name is not None:
 # target_metadata = mymodel.Base.metadata
 
 from api.pets import models  # noqa
-from db.database import Base  # noqa
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
