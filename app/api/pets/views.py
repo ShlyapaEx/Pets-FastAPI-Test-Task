@@ -1,13 +1,14 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Body, Depends
+from fastapi import APIRouter, Body, Depends, HTTPException
 from pydantic import PositiveInt, conlist
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.pets.queries import (create_new_pet, delete_many_pets,
-                              get_existing_pets_ids, get_pets)
+                              get_existing_pets_ids, get_pets, is_pet_in_db, update_pet_by_id)
 from api.pets.schemas import (PetCreateSchema, PetDeleteResponseSchema,
-                              PetReadListWithCountSchema, PetReadSchema)
+                              PetReadListWithCountSchema, PetReadSchema,
+                              PetUpdateSchema)
 from db.database import get_db_session
 
 pets_router = APIRouter()
@@ -19,7 +20,7 @@ async def list_pets(session: AsyncSession = Depends(get_db_session),
     """
     The list_pets route returns a list of pets from database.
     \f
-    :param session: AsyncSession: Get the SQLAlchemy async database session using dependency
+    :param session: AsyncSession: Get SQLAlchemy async database session using dependency
     :param limit: int | None: Limit the number of pets returned
     :return: A dict with two keys: count and items
     """
@@ -34,7 +35,7 @@ async def create_pet(*, session: AsyncSession = Depends(get_db_session),
     """
     The create_pet route creates a new pet in the database.
     \f
-    :param session: AsyncSession: Get the SQLAlchemy async database session using dependency
+    :param session: AsyncSession: Get SQLAlchemy async database session using dependency
     :param pet: PetCreateSchema: Validate the data that is passed to the function
     :return: A newly created pet object
     """
@@ -52,7 +53,7 @@ async def delete_pets(*, session: AsyncSession = Depends(get_db_session),
     Before deleting it checks that pets actually exist in database
     and deletes them if so. Otherwise it adds non-existing pet ids to error list.
     \f
-    :param session: AsyncSession: Get the SQLAlchemy async database session using dependency
+    :param session: AsyncSession: Get SQLAlchemy async database session using dependency
     :param ids: list of pet ids to delete from database
     :return: A dictionary with two keys: count of deleted pets and list of errors
     """
@@ -67,3 +68,23 @@ async def delete_pets(*, session: AsyncSession = Depends(get_db_session),
 
     await delete_many_pets(session, existing_pets_ids)
     return {'deleted': len(existing_pets_ids), 'errors': errors}
+
+
+@pets_router.patch('/', response_model=PetReadSchema)
+async def update_pet(*, session: AsyncSession = Depends(get_db_session),
+                     pet: PetUpdateSchema):
+    """
+    The update_pet route updates a pet in the database.
+    \f
+    :param session: AsyncSession: Get SQLAlchemy async database session using dependency
+    :param pet: PetUpdateSchema: Get the pet object from the request body
+    :return: The updated pet object
+    """
+    if not await is_pet_in_db(session, pet.id):
+        raise HTTPException(status_code=404,
+                            detail=f'Pet with id {pet.id} was not found')
+
+    updated_pet_params = pet.dict(exclude_none=True, exclude={'id'})
+    new_pet = await update_pet_by_id(session=session, id=pet.id,
+                                     **updated_pet_params)
+    return new_pet

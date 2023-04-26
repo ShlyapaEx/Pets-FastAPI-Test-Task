@@ -1,4 +1,4 @@
-from sqlalchemy import ScalarResult, delete, select
+from sqlalchemy import ScalarResult, delete, exists, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.pets.models import Pet
@@ -58,3 +58,33 @@ async def delete_many_pets(session: AsyncSession, ids: list[int]) -> None:
     query = delete(Pet).where(Pet.id.in_(ids))
     await session.execute(query)
     await session.commit()
+
+
+async def is_pet_in_db(session: AsyncSession, id: int) -> bool | None:
+    """
+    The is_pet_in_db function checks if a pet with the given id exists in the database.
+
+    :param session: AsyncSession: SQLAlchemy AsyncSession object
+    :param id: int: Еhe id of the pet that we want to check
+    :return: A boolean or none
+    """
+    query = select(exists(Pet).where(Pet.id == id))
+    pet = await session.execute(query)
+    return pet.scalar()
+
+
+async def update_pet_by_id(session: AsyncSession, id: int, **kwargs):
+    """
+    The update_pet_by_id function updates a pet in database by id.
+
+    :param session: AsyncSession: SQLAlchemy AsyncSession object
+    :param id: int: Id of the pet to be updated
+    :param **kwargs: The values that will be updated
+    :return: The updated pet object
+    """
+    query = update(Pet).where(Pet.id == id).values(kwargs).returning(Pet)
+    result = await session.execute(query)
+    updated_pet = result.scalar()
+    await session.commit()
+    await session.refresh(updated_pet)
+    return updated_pet
