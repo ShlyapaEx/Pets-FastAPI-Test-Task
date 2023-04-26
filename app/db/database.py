@@ -19,6 +19,11 @@ Base = declarative_base()
 
 
 async def get_db_session() -> AsyncSession:
-    """Dependency for getting async session"""
+    """
+    The get_db_session function is a dependency for getting an async session.
+    It uses the async_session context manager to create a new session, and then yields it.
+
+    :return: An AsyncSession object
+    """
     async with async_session() as session:
         yield session
