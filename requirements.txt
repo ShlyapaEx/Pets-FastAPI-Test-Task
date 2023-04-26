@@ -2,6 +2,6 @@ alembic==1.10.3
 asyncpg==0.27.0
 fastapi==0.95.1
 flake8==6.0.0
-psycopg2==2.9.6
+psycopg2-binary==2.9.6
 pylint==2.17.2
 uvicorn==0.21.1
