@@ -5,7 +5,7 @@ from pydantic import conlist
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.pets.queries import (create_new_pet, delete_many_pets, get_pets,
-                              is_pet_existing)
+                              get_existing_pets_ids)
 from api.pets.schemas import (PetCreateSchema, PetReadListWithCountSchema,
                               PetReadSchema)
 from db.database import get_db_session
@@ -33,10 +33,13 @@ async def delete_pets(*, session: AsyncSession = Depends(get_db_session),
                       ids: Annotated[conlist(item_type=int, unique_items=True,
                                              min_items=1), Body()]):  # type: ignore
     errors = []
-    for pet_id in ids[:]:
-        if not await is_pet_existing(session, pet_id):
-            errors.append({'id': pet_id,
-                           'error': 'Pet with the matching ID was not found.'})
-            ids.remove(pet_id)
-    await delete_many_pets(session, ids)
-    return {'deleted': len(ids), 'errors': errors}
+    existing_pets = await get_existing_pets_ids(session, ids)
+    existing_pets_ids = existing_pets.all()
+
+    not_existing_ids = set(ids) - set(existing_pets_ids)
+    for bad_id in not_existing_ids:
+        errors.append({'id': bad_id,
+                       'error': 'Pet with the matching ID was not found.'})
+
+    await delete_many_pets(session, existing_pets_ids)
+    return {'deleted': len(existing_pets_ids), 'errors': errors}

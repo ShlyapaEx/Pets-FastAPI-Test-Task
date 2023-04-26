@@ -19,10 +19,10 @@ async def create_new_pet(session: AsyncSession, pet: PetCreateSchema):
     return new_pet
 
 
-async def is_pet_existing(session: AsyncSession, id: int):
-    query = select(exists(Pet).where(Pet.id == id))
-    pet = await session.execute(query)
-    return pet.scalar()
+async def get_existing_pets_ids(session: AsyncSession, ids: list[int]):
+    query = select(Pet.id).where(Pet.id.in_(ids))
+    pets = await session.execute(query)
+    return pets.scalars()
 
 
 async def delete_many_pets(session: AsyncSession, ids: list[int]):
