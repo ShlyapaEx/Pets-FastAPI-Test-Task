@@ -18,8 +18,8 @@ async def list_pets(session: AsyncSession = Depends(get_db_session),
                     limit: int | None = 20):
     """
     The list_pets route returns a list of pets from database.
-
-    :param session: AsyncSession: Get the database session
+    \f
+    :param session: AsyncSession: Get the SQLAlchemy async database session using dependency
     :param limit: int | None: Limit the number of pets returned
     :return: A dict with two keys: count and items
     """
@@ -33,8 +33,8 @@ async def create_pet(*, session: AsyncSession = Depends(get_db_session),
                      pet: PetCreateSchema):
     """
     The create_pet route creates a new pet in the database.
-
-    :param session: AsyncSession: Get the database session
+    \f
+    :param session: AsyncSession: Get the SQLAlchemy async database session using dependency
     :param pet: PetCreateSchema: Validate the data that is passed to the function
     :return: A newly created pet object
     """
@@ -51,8 +51,8 @@ async def delete_pets(*, session: AsyncSession = Depends(get_db_session),
     The delete_pets route deletes pets by their IDs.
     Before deleting it checks that pets actually exist in database
     and deletes them if so. Otherwise it adds non-existing pet ids to error list.
-
-    :param session: AsyncSession: Get the database session
+    \f
+    :param session: AsyncSession: Get the SQLAlchemy async database session using dependency
     :param ids: list of pet ids to delete from database
     :return: A dictionary with two keys: count of deleted pets and list of errors
     """
