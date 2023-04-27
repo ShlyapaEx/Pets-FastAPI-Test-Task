@@ -16,12 +16,12 @@ pets_router = APIRouter()
 
 @pets_router.get('/', response_model=PetReadListWithCountSchema)
 async def list_pets(session: AsyncSession = Depends(get_db_session),
-                    limit: int | None = 20):
+                    limit: PositiveInt | None = 20):
     """
     The list_pets route returns a list of pets from database.
     \f
     :param session: AsyncSession: Get SQLAlchemy async database session using dependency
-    :param limit: int | None: Limit the number of pets returned
+    :param limit: PositiveInt | None: Limit the number of pets returned
     :return: A dict with two keys: count and items
     """
     pets_query = await get_pets(session, limit)
